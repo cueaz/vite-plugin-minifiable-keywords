@@ -1,9 +1,9 @@
-import { readFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from '@babel/parser';
 import type { Node } from 'estree';
 import { walk } from 'estree-walker';
-import { glob } from 'fast-glob';
+import fg from 'fast-glob';
 import type { Plugin, ResolvedConfig, ViteDevServer } from 'vite';
 
 const PLUGIN_NAME = 'vite-plugin-keywords';
@@ -78,7 +78,7 @@ const extractKeywords = (code: string): Set<string> => {
 
 export const keywordsPlugin = (options: KeywordsPluginOptions = {}): Plugin => {
   const collectedKeywords = new Set<string>();
-  let server: ViteDevServer;
+  let server: ViteDevServer | null = null;
   let config: ResolvedConfig;
 
   const { include = 'src/**/*.{js,ts,jsx,tsx}' } = options;
@@ -90,7 +90,27 @@ export const keywordsPlugin = (options: KeywordsPluginOptions = {}): Plugin => {
     return exports;
   };
 
-  const invalidateModule = (absoluteId: string) => {
+  const generateTypesFile = async (
+    directory: string = '.keywords',
+    filename: string = 'types.d.ts',
+  ): Promise<void> => {
+    const collectedType = [...collectedKeywords]
+      .map((key) => `'${key}'`)
+      .join(' | ');
+    const content = `
+/// <reference types="${PLUGIN_NAME}/global" />
+declare module '${VIRTUAL_MODULE_ID}/types' {
+  interface Types {
+    collected: ${collectedKeywords.size > 0 ? collectedType : 'never'};
+  }
+}`;
+    const root = path.posix.join(config.root, directory);
+    await mkdir(root, { recursive: true });
+    await writeFile(path.posix.join(root, filename), `${content.trim()}\n`);
+  };
+
+  const invalidateModule = (absoluteId: string): void => {
+    if (!server) return;
     const { moduleGraph } = server;
     const module = moduleGraph.getModuleById(absoluteId);
     if (module) {
@@ -117,7 +137,7 @@ export const keywordsPlugin = (options: KeywordsPluginOptions = {}): Plugin => {
         `[${PLUGIN_NAME}] Scanning project files for keywords...`,
       );
 
-      const files = await glob(include, {
+      const files = await fg.glob(include, {
         cwd: config.root,
         absolute: true,
         ignore: ['**/node_modules/**'],
@@ -136,6 +156,8 @@ export const keywordsPlugin = (options: KeywordsPluginOptions = {}): Plugin => {
       config.logger.info(
         `[${PLUGIN_NAME}] Scan complete. Found ${collectedKeywords.size} unique keywords.`,
       );
+
+      await generateTypesFile();
     },
 
     resolveId(source, importer) {
@@ -155,8 +177,8 @@ export const keywordsPlugin = (options: KeywordsPluginOptions = {}): Plugin => {
       }
     },
 
-    transform(code, id) {
-      if (config.command !== 'build') return;
+    async transform(code, id) {
+      if (config.command === 'build') return;
 
       const [validId] = splitQuery(id);
       const fileExt = path.extname(validId);
@@ -178,6 +200,7 @@ export const keywordsPlugin = (options: KeywordsPluginOptions = {}): Plugin => {
       const newKeywordsAdded = collectedKeywords.size > initialSize;
       if (server && newKeywordsAdded) {
         invalidateModule(RESOLVED_VIRTUAL_MODULE_ID);
+        await generateTypesFile();
       }
     },
   };
