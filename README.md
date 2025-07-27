@@ -4,7 +4,7 @@ A Vite plugin that provides a way to use minifiable `Symbols` in place of string
 
 Modern JavaScript minifiers cannot shorten string literals, which are often used for object keys or as distinct values. This plugin offers a solution by providing a mechanism to use `Symbol` primitives in their place. Since these `Symbols` are assigned to variables, they can be minified, leading to a smaller final bundle.
 
-This approach introduces a trade-off between a small reduction in bundle size and an increase in code complexity. It is best suited for performance-critical libraries or applications where every byte counts.
+This approach introduces a trade-off between a small reduction in bundle size and an increase in code complexity. It is best suited for ~~performance-critical libraries or applications where every byte counts~~ minification nerds.
 
 ## How It Works: The Core Problem and Solution
 
@@ -83,7 +83,7 @@ pnpm add -D vite-plugin-keywords
     /// <reference path="../.keywords/types.d.ts" />
     ```
 
-3.  Exclude the generated types file from your version control system (e.g., Git) by adding it to your `.gitignore`.
+3.  Exclude the generated types file from your version control system (e.g., Git).
 
     ```gitignore
     # .gitignore
@@ -100,6 +100,8 @@ pnpm add -D vite-plugin-keywords
       },
     }
     ```
+
+5.  The `.keywords/types.d.ts` type file is created automatically on `vite dev/build`, or manually via the `keywords` script.
 
 ## Usage Example
 
