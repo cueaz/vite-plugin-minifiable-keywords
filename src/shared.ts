@@ -1,8 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from '@babel/parser';
-import type { Node } from 'estree';
-import { walk } from 'estree-walker';
+import _traverse, { type Node } from '@babel/traverse';
 import fg from 'fast-glob';
 import type { Logger } from 'vite';
 
@@ -19,25 +18,30 @@ export interface KeywordsPluginOptions {
   srcDir?: string;
 }
 
+// ref: https://github.com/babel/babel/discussions/13093
+const traverse =
+  typeof _traverse === 'function'
+    ? _traverse
+    : ((_traverse as any).default as typeof _traverse);
+
 export const extractKeywords = (code: string): Set<string> => {
   const keywords = new Set<string>();
   let ast: Node;
   try {
-    // Deviations from ESTree spec; not relevant for keyword extraction
-    // ref: https://babeljs.io/docs/babel-parser#output
     ast = parse(code, {
       sourceType: 'module',
       plugins: ['typescript', 'jsx'],
       errorRecovery: true,
-    }) as unknown as Node;
+    });
   } catch (e) {
     return keywords;
   }
 
   let keywordNamespace: string | null = null;
 
-  walk(ast, {
-    enter(node) {
+  traverse(ast, {
+    enter(nodePath) {
+      const node = nodePath.node;
       if (
         node.type === 'ImportDeclaration' &&
         node.source.value === VIRTUAL_MODULE_ID
@@ -47,7 +51,7 @@ export const extractKeywords = (code: string): Set<string> => {
         );
         if (specifier) {
           keywordNamespace = specifier.local.name;
-          this.skip();
+          nodePath.stop();
         }
       }
     },
@@ -57,8 +61,10 @@ export const extractKeywords = (code: string): Set<string> => {
     return keywords;
   }
 
-  walk(ast, {
-    enter(node) {
+  traverse(ast, {
+    enter(nodePath) {
+      const node = nodePath.node;
+
       if (
         node.type === 'MemberExpression' &&
         !node.computed && // Exclude computed properties like K['xyz']
@@ -67,6 +73,15 @@ export const extractKeywords = (code: string): Set<string> => {
         node.property.type === 'Identifier'
       ) {
         keywords.add(node.property.name);
+      }
+
+      if (
+        node.type === 'TSQualifiedName' &&
+        node.left.type === 'Identifier' &&
+        node.left.name === keywordNamespace &&
+        node.right.type === 'Identifier'
+      ) {
+        keywords.add(node.right.name);
       }
     },
   });

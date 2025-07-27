@@ -15,12 +15,14 @@ Consider a standard JavaScript object. The property names are strings and will p
 ```ts
 // The keys 'userName' and 'preferredTheme' are string literals.
 const userProfile = {
-  userName: 'Alex',
-  preferredTheme: 'dark',
+  userName: 'Alex' as string,
+  preferredTheme: 'dark' as 'light' | 'dark',
 };
+console.log(userProfile.userName);
 
 // Minified Output: The keys remain unchanged.
 const a = { userName: 'Alex', preferredTheme: 'dark' };
+console.log(a.userName);
 ```
 
 This plugin allows you to adopt a different pattern, using `Symbols` instead of strings. These `Symbols` are imported from a virtual module provided by the plugin.
@@ -31,14 +33,17 @@ This plugin allows you to adopt a different pattern, using `Symbols` instead of 
 import * as K from 'virtual:keywords';
 
 const userProfile = {
-  [K.userName]: 'Alex', // typeof K.userName : symbol & { __KEYWORD__: 'userName' }
-  [K.preferredTheme]: 'dark',
+  [K.userName]: 'Alex' as string,
+  [K.preferredTheme]: K.dark as typeof K.light | typeof K.dark,
 };
+console.log(userProfile[K.userName]);
 
 // Minified Output: The variables representing the Symbols are shortened.
 const b = Symbol();
 const c = Symbol();
-const a = { [b]: 'Alex', [c]: 'dark' };
+const d = Symbol();
+const a = { [b]: 'Alex', [c]: d };
+console.log(a[b]);
 ```
 
 ## How It Works
@@ -114,71 +119,6 @@ pnpm add -D vite-plugin-keywords
 
 5.  The `.keywords/types.d.ts` type file is created automatically on `vite dev/build`, or manually via the `keywords` script.
 
-## Usage Example
-
-Now that you understand the concept, the code below will make more sense.
-You, the developer, choose where to use these `Symbols` instead of plain strings.
-
-### Using Symbols for Type-Safe Literals
-
-This technique can also be applied to string unions, providing type safety while reducing bundle size.
-
-<table>
-<thead>
-  <tr>
-    <th>Standard Approach</th>
-    <th>Using Symbols via this Plugin</th>
-  </tr>
-</thead>
-<tbody>
-<tr>
-<td valign="top">
-
-```tsx
-// src/components/Button.tsx
-
-type ButtonVariant = 'primary' | 'secondary' | 'danger';
-
-interface ButtonProps {
-  variant: ButtonVariant;
-  children: React.ReactNode;
-}
-
-const Button = ({ variant, children }: ButtonProps) => {
-  // ...
-};
-
-// Usage
-<Button variant="primary">Click Me</Button>;
-```
-
-</td>
-<td valign="top">
-
-```tsx
-// src/components/Button.tsx
-import * as K from 'virtual:keywords';
-
-type ButtonVariant = typeof K.primary | typeof K.secondary | typeof K.danger;
-
-interface ButtonProps {
-  variant: ButtonVariant;
-  children: React.ReactNode;
-}
-
-const Button = ({ variant, children }: ButtonProps) => {
-  // ...
-};
-
-// Usage
-<Button variant={K.primary}>Click Me</Button>;
-```
-
-</td>
-</tr>
-</tbody>
-</table>
-
 ## Options
 
 ```ts
@@ -198,7 +138,7 @@ export default {
 };
 ```
 
-## Technical Limitations
+## Limitations
 
 - **Frameworks**: The plugin uses Babel to parse JavaScript and TypeScript files. It cannot parse keywords from inside the template blocks of frameworks like Vue, Svelte, or Astro.
 - **Dynamic Access**: Only static property access (e.g., `K.myKeyword`) is detected. Dynamic, computed access (e.g., `K['myKeyword']`) will not be identified by the plugin.

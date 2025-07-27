@@ -48,6 +48,7 @@ export const keywordsPlugin = (
 
   return {
     name: PLUGIN_NAME,
+    enforce: 'pre', // Ensure this plugin runs before TypeScript type removal
     __OPTIONS__: options,
 
     configResolved(resolvedConfig) {
@@ -59,12 +60,10 @@ export const keywordsPlugin = (
     },
 
     async buildStart() {
-      if (config.command !== 'build') return;
-
       collectedKeywords.clear();
       for (const key of await collectKeywordsFromFiles(
-        config.root,
         srcDir,
+        config.root,
         config.logger,
       )) {
         collectedKeywords.add(key);

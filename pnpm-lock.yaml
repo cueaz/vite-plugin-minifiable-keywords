@@ -11,9 +11,9 @@ importers:
       '@babel/parser':
         specifier: ^7.28.0
         version: 7.28.0
-      estree-walker:
-        specifier: ^3.0.3
-        version: 3.0.3
+      '@babel/traverse':
+        specifier: ^7.28.0
+        version: 7.28.0
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
@@ -24,9 +24,9 @@ importers:
       '@ianvs/prettier-plugin-sort-imports':
         specifier: ^4.5.1
         version: 4.5.1(prettier@3.6.2)
-      '@types/estree':
-        specifier: ^1.0.8
-        version: 1.0.8
+      '@types/babel__traverse':
+        specifier: ^7.20.7
+        version: 7.20.7
       '@types/node':
         specifier: ^24.1.0
         version: 24.1.0
@@ -387,6 +387,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@types/babel__traverse@7.20.7':
+    resolution: {integrity: sha512-dkO5fhS7+/oos4ciWxyEyjWe48zmG6wbCheo/G2ZnHx4fs3EU6YC6UM8rk56gAjNJ9P3MTH2jo5jb92/K6wbng==}
+
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
@@ -493,9 +496,6 @@ packages:
     resolution: {integrity: sha512-vVC0USHGtMi8+R4Kz8rt6JhEWLxsv9Rnu/lGYbPR8u47B+DCBksq9JarW0zOO7bs37hyOK1l2/oqtbciutL5+Q==}
     engines: {node: '>=18'}
     hasBin: true
-
-  estree-walker@3.0.3:
-    resolution: {integrity: sha512-7RUKfXgSMMkzt6ZuXmqapOurLGPPfgj6l9uRZ7lRGolvk0y2yocc35LdcxKC5PQZdn2DMqioAQ2NoWcrTKmm6g==}
 
   fast-glob@3.3.3:
     resolution: {integrity: sha512-7MptL8U0cqcFdzIzwOTHoilX9x5BrNqye7Z/LuC7kCMRio1EMSyqRK3BEAUD7sXRq4iT4AzTVuZdhgQ2TCvYLg==}
@@ -1138,6 +1138,10 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.45.1':
     optional: true
 
+  '@types/babel__traverse@7.20.7':
+    dependencies:
+      '@babel/types': 7.28.2
+
   '@types/estree@1.0.8': {}
 
   '@types/node@24.1.0':
@@ -1239,10 +1243,6 @@ snapshots:
       '@esbuild/win32-arm64': 0.25.8
       '@esbuild/win32-ia32': 0.25.8
       '@esbuild/win32-x64': 0.25.8
-
-  estree-walker@3.0.3:
-    dependencies:
-      '@types/estree': 1.0.8
 
   fast-glob@3.3.3:
     dependencies:
