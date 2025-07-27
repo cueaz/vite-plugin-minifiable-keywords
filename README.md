@@ -2,11 +2,11 @@
 
 A Vite plugin that provides a way to use minifiable `Symbols` in place of string literals and object keys, aimed at developers focused on extreme minification.
 
-Modern JavaScript minifiers cannot shorten string literals, which are often used for object keys or as distinct values. This plugin offers a solution by providing a mechanism to use `Symbol` primitives in their place. Since these `Symbols` are assigned to variables, they can be minified, leading to a smaller final bundle.
-
 This approach introduces a trade-off between a small reduction in bundle size and an increase in code complexity. It is best suited for ~~performance-critical libraries or applications where every byte counts~~ minification nerds.
 
-## How It Works: The Core Problem and Solution
+## Rationale
+
+Modern JavaScript minifiers cannot shorten string literals, which are often used for object keys or as distinct values. This plugin offers a solution by providing a mechanism to use `Symbol` primitives in their place. Since these `Symbols` are assigned to variables, they can be minified, leading to a smaller final bundle.
 
 Consider a standard JavaScript object. The property names are strings and will persist in the minified output.
 
@@ -31,7 +31,7 @@ This plugin allows you to adopt a different pattern, using `Symbols` instead of 
 import * as K from 'virtual:keywords';
 
 const userProfile = {
-  [K.userName]: 'Alex',
+  [K.userName]: 'Alex', // typeof K.userName : symbol & { __KEYWORD__: 'userName' }
   [K.preferredTheme]: 'dark',
 };
 
@@ -39,6 +39,17 @@ const userProfile = {
 const b = Symbol();
 const c = Symbol();
 const a = { [b]: 'Alex', [c]: 'dark' };
+```
+
+## How It Works
+
+The plugin works by scanning your code for usages of the `virtual:keywords` module and generating the corresponding `Symbol` exports and types on the fly.
+
+```ts
+// virtual:keywords
+export const userName = /* @__PURE__ */ Symbol();
+export const preferredTheme = /* @__PURE__ */ Symbol();
+// ... and so on for all other keywords found.
 ```
 
 ## Installation
@@ -105,7 +116,8 @@ pnpm add -D vite-plugin-keywords
 
 ## Usage Example
 
-The plugin works by scanning your code for usages of the `virtual:keywords` module and generating the corresponding `Symbol` exports and types on the fly. You, the developer, choose where to use these `Symbols` instead of plain strings.
+Now that you understand the concept, the code below will make more sense.
+You, the developer, choose where to use these `Symbols` instead of plain strings.
 
 ### Using Symbols for Type-Safe Literals
 
