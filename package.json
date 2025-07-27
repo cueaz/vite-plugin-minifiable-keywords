@@ -40,6 +40,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "check": "prettier --check . && tsc --noEmit",
     "format": "prettier --write ."
   },
   "dependencies": {
