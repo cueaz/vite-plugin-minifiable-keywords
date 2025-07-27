@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-keywords",
   "version": "0.0.1",
-  "description": "",
+  "description": "A Vite plugin that provides minifiable Symbols to use in place of string literals for extreme minification.",
   "keywords": [
     "vite",
     "vite-plugin"
