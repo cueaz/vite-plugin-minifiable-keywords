@@ -121,22 +121,7 @@ pnpm add -D vite-plugin-keywords
 
 ## Options
 
-```ts
-// vite.config.ts
-import keywords from 'vite-plugin-keywords';
-
-export default {
-  plugins: [
-    keywords({
-      /**
-       * Source directory for files to scan for keywords.
-       * @default 'src'
-       */
-      srcDir: 'src',
-    }),
-  ],
-};
-```
+None
 
 ## Limitations
 

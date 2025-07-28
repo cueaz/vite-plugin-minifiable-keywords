@@ -8,15 +8,7 @@ import type { Logger } from 'vite';
 export const PLUGIN_NAME = 'vite-plugin-keywords';
 export const VIRTUAL_MODULE_ID = 'virtual:keywords';
 
-export const DEFAULT_SRC_DIR = 'src';
-
-export interface KeywordsPluginOptions {
-  /**
-   * Source directory for files to scan for keywords.
-   * @default 'src'
-   */
-  srcDir?: string;
-}
+export interface KeywordsPluginOptions {}
 
 // ref: https://github.com/babel/babel/discussions/13093
 const traverse =
@@ -111,7 +103,6 @@ declare module '${VIRTUAL_MODULE_ID}/types' {
 };
 
 export const collectKeywordsFromFiles = async (
-  srcDir: string,
   root: string,
   logger: Logger,
 ): Promise<Set<string>> => {
@@ -119,7 +110,7 @@ export const collectKeywordsFromFiles = async (
 
   logger.info(`[${PLUGIN_NAME}] Scanning project files for keywords...`);
 
-  const files = await fg.glob(`${srcDir}/**/*.{js,ts,jsx,tsx}`, {
+  const files = await fg.glob('**/*.{js,ts,jsx,tsx}', {
     cwd: root,
     absolute: true,
     ignore: ['**/node_modules/**'],

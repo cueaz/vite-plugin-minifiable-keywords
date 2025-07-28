@@ -1,10 +1,8 @@
 import { resolveConfig } from 'vite';
 import {
   collectKeywordsFromFiles,
-  DEFAULT_SRC_DIR,
   generateTypesFile,
   PLUGIN_NAME,
-  type KeywordsPluginOptions,
 } from './shared';
 
 const main = async () => {
@@ -21,15 +19,10 @@ const main = async () => {
     process.exit(1);
   }
 
-  const options = (keywordsPlugin as any).__OPTIONS__ as KeywordsPluginOptions;
-  const { srcDir = DEFAULT_SRC_DIR } = options;
+  // const options = (keywordsPlugin as any).__OPTIONS__ as KeywordsPluginOptions;
 
   const root = config.root;
-  const collectedKeywords = await collectKeywordsFromFiles(
-    srcDir,
-    root,
-    logger,
-  );
+  const collectedKeywords = await collectKeywordsFromFiles(root, logger);
   await generateTypesFile(collectedKeywords, root);
 };
 

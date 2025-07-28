@@ -2,7 +2,6 @@ import path from 'node:path';
 import type { Plugin, ResolvedConfig, ViteDevServer } from 'vite';
 import {
   collectKeywordsFromFiles,
-  DEFAULT_SRC_DIR,
   extractKeywords,
   generateTypesFile,
   PLUGIN_NAME,
@@ -22,8 +21,6 @@ export const keywordsPlugin = (
   const collectedKeywords = new Set<string>();
   let server: ViteDevServer | null = null;
   let config: ResolvedConfig;
-
-  const { srcDir = DEFAULT_SRC_DIR } = options;
 
   const generateModuleCode = (): string => {
     const isDev = config.mode !== 'production';
@@ -62,7 +59,6 @@ export const keywordsPlugin = (
     async buildStart() {
       collectedKeywords.clear();
       for (const key of await collectKeywordsFromFiles(
-        srcDir,
         config.root,
         config.logger,
       )) {
