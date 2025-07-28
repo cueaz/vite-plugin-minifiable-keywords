@@ -1,5 +1,5 @@
 import path from 'node:path';
-import type { Plugin, ResolvedConfig, ViteDevServer } from 'vite';
+import type { EnvironmentModuleGraph, Plugin, ResolvedConfig } from 'vite';
 import {
   collectKeywordsFromFiles,
   extractKeywords,
@@ -19,7 +19,6 @@ export const keywordsPlugin = (
   options: KeywordsPluginOptions = {},
 ): Plugin & { __OPTIONS__: KeywordsPluginOptions } => {
   const collectedKeywords = new Set<string>();
-  let server: ViteDevServer | null = null;
   let config: ResolvedConfig;
 
   const generateModuleCode = (): string => {
@@ -33,9 +32,10 @@ export const keywordsPlugin = (
     return exports;
   };
 
-  const invalidateModule = (absoluteId: string): void => {
-    if (!server) return;
-    const { moduleGraph } = server;
+  const invalidateModule = (
+    absoluteId: string,
+    moduleGraph: EnvironmentModuleGraph,
+  ): void => {
     const module = moduleGraph.getModuleById(absoluteId);
     if (module) {
       moduleGraph.invalidateModule(module);
@@ -45,15 +45,10 @@ export const keywordsPlugin = (
 
   return {
     name: PLUGIN_NAME,
-    enforce: 'pre', // Ensure this plugin runs before TypeScript type removal
     __OPTIONS__: options,
 
     configResolved(resolvedConfig) {
       config = resolvedConfig;
-    },
-
-    configureServer(devServer) {
-      server = devServer;
     },
 
     async buildStart() {
@@ -61,6 +56,8 @@ export const keywordsPlugin = (
       for (const key of await collectKeywordsFromFiles(
         config.root,
         config.logger,
+        config.build.outDir,
+        config.cacheDir,
       )) {
         collectedKeywords.add(key);
       }
@@ -84,18 +81,18 @@ export const keywordsPlugin = (
       }
     },
 
-    async transform(code, id) {
-      if (config.command === 'build') return;
+    async hotUpdate({ type, file, read }) {
+      if (type === 'delete') return;
 
-      const [validId] = splitQuery(id);
-      const fileExt = path.extname(validId);
+      const fileExt = path.extname(file);
       if (
         !['.js', '.ts', '.jsx', '.tsx'].includes(fileExt) ||
-        validId.includes('node_modules')
+        file.includes('/.')
       ) {
         return;
       }
 
+      const code = await read();
       const keywordsInFile = extractKeywords(code);
       if (keywordsInFile.size === 0) return;
 
@@ -106,7 +103,10 @@ export const keywordsPlugin = (
 
       const newKeywordsAdded = collectedKeywords.size > initialSize;
       if (newKeywordsAdded) {
-        invalidateModule(RESOLVED_VIRTUAL_MODULE_ID);
+        invalidateModule(
+          RESOLVED_VIRTUAL_MODULE_ID,
+          this.environment.moduleGraph,
+        );
         await generateTypesFile(collectedKeywords, config.root);
       }
     },

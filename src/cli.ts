@@ -22,7 +22,12 @@ const main = async () => {
   // const options = (keywordsPlugin as any).__OPTIONS__ as KeywordsPluginOptions;
 
   const root = config.root;
-  const collectedKeywords = await collectKeywordsFromFiles(root, logger);
+  const collectedKeywords = await collectKeywordsFromFiles(
+    root,
+    logger,
+    config.build.outDir,
+    config.cacheDir,
+  );
   await generateTypesFile(collectedKeywords, root);
 };
 

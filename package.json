@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-keywords",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "A Vite plugin that provides minifiable Symbols to use in place of string literals for extreme minification.",
   "keywords": [
     "vite",
@@ -46,7 +46,7 @@
   "dependencies": {
     "@babel/parser": "^7.28.0",
     "@babel/traverse": "^7.28.0",
-    "fast-glob": "^3.3.3"
+    "tinyglobby": "^0.2.14"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.5.1",

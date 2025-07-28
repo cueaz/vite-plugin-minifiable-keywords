@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from '@babel/parser';
 import _traverse, { type Node } from '@babel/traverse';
-import fg from 'fast-glob';
+import { glob } from 'tinyglobby';
 import type { Logger } from 'vite';
 
 export const PLUGIN_NAME = 'vite-plugin-keywords';
@@ -105,15 +105,17 @@ declare module '${VIRTUAL_MODULE_ID}/types' {
 export const collectKeywordsFromFiles = async (
   root: string,
   logger: Logger,
+  outDir: string,
+  cacheDir: string,
 ): Promise<Set<string>> => {
   const collectedKeywords = new Set<string>();
 
   logger.info(`[${PLUGIN_NAME}] Scanning project files for keywords...`);
 
-  const files = await fg.glob('**/*.{js,ts,jsx,tsx}', {
+  const files = await glob('**/*.{js,ts,jsx,tsx}', {
     cwd: root,
     absolute: true,
-    ignore: ['**/node_modules/**'],
+    ignore: ['**/node_modules/**', `${outDir}/**`, `${cacheDir}/**`],
   });
 
   await Promise.all(
