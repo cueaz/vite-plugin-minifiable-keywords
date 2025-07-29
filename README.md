@@ -1,8 +1,8 @@
-# vite-plugin-keywords
+# vite-plugin-minifiable-keywords
 
 A Vite plugin that provides a way to use minifiable `Symbols` in place of string literals and object keys, aimed at developers focused on extreme minification.
 
-This approach introduces a trade-off between a small reduction in bundle size and an increase in code complexity. It is best suited for ~~performance-critical libraries or applications where every byte counts~~ minification nerds.
+This approach introduces a trade-off between a small reduction in bundle size and an increase in code complexity. It is best suited for ~~applications where every byte counts~~ minification nerds.
 
 ## Rationale
 
@@ -27,7 +27,7 @@ console.log(a.userName);
 
 This plugin allows you to adopt a different pattern, using `Symbols` instead of strings. These `Symbols` are imported from a virtual module provided by the plugin.
 
-**With `vite-plugin-keywords`:**
+**With `vite-plugin-minifiable-keywords`:**
 
 ```ts
 import * as K from 'virtual:keywords';
@@ -54,17 +54,19 @@ The plugin works by scanning your code for usages of the `virtual:keywords` modu
 // virtual:keywords
 export const userName = /* @__PURE__ */ Symbol();
 export const preferredTheme = /* @__PURE__ */ Symbol();
+export const dark = /* @__PURE__ */ Symbol();
+export const light = /* @__PURE__ */ Symbol();
 // ... and so on for all other keywords found.
 ```
 
 ## Installation
 
 ```bash
-npm install -D vite-plugin-keywords
+npm install -D vite-plugin-minifiable-keywords
 # or
-yarn add -D vite-plugin-keywords
+yarn add -D vite-plugin-minifiable-keywords
 # or
-pnpm add -D vite-plugin-keywords
+pnpm add -D vite-plugin-minifiable-keywords
 ```
 
 ## Setup
@@ -74,14 +76,14 @@ pnpm add -D vite-plugin-keywords
     ```ts
     // vite.config.ts
     import { defineConfig } from 'vite';
-    import keywords from 'vite-plugin-keywords';
+    import keywords from 'vite-plugin-minifiable-keywords';
 
     export default defineConfig({
       plugins: [keywords()],
     });
     ```
 
-2.  For TypeScript projects, include the generated types file in your `tsconfig.json` or `src/env.d.ts`.
+2.  Include the generated types file in your `tsconfig.json` or `src/env.d.ts`.
 
     ```jsonc
     // tsconfig.json

@@ -5,10 +5,10 @@ import _traverse, { type Node } from '@babel/traverse';
 import { glob } from 'tinyglobby';
 import type { Logger } from 'vite';
 
-export const PLUGIN_NAME = 'vite-plugin-keywords';
+export const PLUGIN_NAME = 'vite-plugin-minifiable-keywords';
 export const VIRTUAL_MODULE_ID = 'virtual:keywords';
 
-export interface KeywordsPluginOptions {}
+export interface MinifiableKeywordsPluginOptions {}
 
 // ref: https://github.com/babel/babel/discussions/13093
 const traverse =

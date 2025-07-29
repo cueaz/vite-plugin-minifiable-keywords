@@ -6,18 +6,18 @@ import {
   generateTypesFile,
   PLUGIN_NAME,
   VIRTUAL_MODULE_ID,
-  type KeywordsPluginOptions,
+  type MinifiableKeywordsPluginOptions,
 } from './shared';
 
 const RESOLVED_VIRTUAL_MODULE_ID = `\0${VIRTUAL_MODULE_ID}`;
 
 const splitQuery = (id: string) => id.split('?');
 
-export { KeywordsPluginOptions };
+export { MinifiableKeywordsPluginOptions };
 
-export const keywordsPlugin = (
-  options: KeywordsPluginOptions = {},
-): Plugin & { __OPTIONS__: KeywordsPluginOptions } => {
+export const minifiableKeywordsPlugin = (
+  options: MinifiableKeywordsPluginOptions = {},
+): Plugin & { __OPTIONS__: MinifiableKeywordsPluginOptions } => {
   const collectedKeywords = new Set<string>();
   let config: ResolvedConfig;
 
@@ -113,4 +113,4 @@ export const keywordsPlugin = (
   };
 };
 
-export default keywordsPlugin;
+export default minifiableKeywordsPlugin;
