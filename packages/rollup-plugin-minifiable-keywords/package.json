@@ -1,6 +1,12 @@
 {
-  "name": "minifiable-keywords",
+  "name": "rollup-plugin-minifiable-keywords",
   "version": "0.0.14",
+  "description": "A Rollup plugin that provides minifiable Symbols to use in place of string literals for extreme minification.",
+  "keywords": [
+    "rollup",
+    "rollup-plugin",
+    "minification"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cueaz/vite-plugin-minifiable-keywords.git"
@@ -26,6 +32,9 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "keywords": "dist/cli.js"
+  },
   "files": [
     "dist",
     "global.d.ts"
@@ -35,14 +44,14 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@babel/parser": "^7.28.0",
-    "@babel/traverse": "^7.28.0",
-    "globby": "^14.1.0"
+    "minifiable-keywords": "workspace:*"
   },
   "devDependencies": {
-    "@types/babel__traverse": "^7.20.7",
     "@types/node": "^24.1.0",
     "rimraf": "catalog:",
     "tsup": "catalog:"
+  },
+  "peerDependencies": {
+    "rollup": "^3.0.0 || ^4.0.0"
   }
 }

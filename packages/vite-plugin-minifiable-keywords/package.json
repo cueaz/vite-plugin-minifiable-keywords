@@ -1,10 +1,11 @@
 {
   "name": "vite-plugin-minifiable-keywords",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "A Vite plugin that provides minifiable Symbols to use in place of string literals for extreme minification.",
   "keywords": [
     "vite",
-    "vite-plugin"
+    "vite-plugin",
+    "minification"
   ],
   "repository": {
     "type": "git",
@@ -39,16 +40,18 @@
     "global.d.ts"
   ],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "clean": "rimraf dist"
   },
   "dependencies": {
     "minifiable-keywords": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
+    "rimraf": "catalog:",
     "tsup": "catalog:"
   },
   "peerDependencies": {
-    "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0"
+    "vite": "^6.0.0 || ^7.0.0"
   }
 }

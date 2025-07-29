@@ -167,3 +167,5 @@ export const generateModuleCode = (
     .join('');
   return exports;
 };
+
+export const splitQuery = (id: string) => id.split('?');

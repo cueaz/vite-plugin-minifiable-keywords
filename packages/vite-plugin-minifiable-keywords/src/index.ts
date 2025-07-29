@@ -5,12 +5,11 @@ import {
   generateModuleCode,
   generateTypesFile,
   RESOLVED_VIRTUAL_MODULE_ID,
+  splitQuery,
   VIRTUAL_MODULE_ID,
 } from 'minifiable-keywords';
 import type { EnvironmentModuleGraph, Plugin, ResolvedConfig } from 'vite';
 import { PLUGIN_NAME } from './shared';
-
-const splitQuery = (id: string) => id.split('?');
 
 export const minifiableKeywordsPlugin = (): Plugin => {
   let collectedKeywords: Set<string>;

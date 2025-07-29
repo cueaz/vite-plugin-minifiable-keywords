@@ -3,3 +3,4 @@ packages:
 
 catalog:
   tsup: '^8.5.0'
+  rimraf: '^6.0.1'

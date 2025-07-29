@@ -1,10 +1,9 @@
 {
-  "name": "root",
-  "version": "0.0.13",
   "private": true,
   "scripts": {
     "build": "pnpm --filter \"./packages/*\" build",
     "check": "prettier --check . && tsc -b",
+    "clean": "pnpm --filter \"./packages/*\" clean",
     "format": "prettier --write ."
   },
   "devDependencies": {
