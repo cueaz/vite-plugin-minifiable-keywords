@@ -1,15 +1,8 @@
 {
-  "include": ["src", "global.d.ts"],
-  "compilerOptions": {
-    "declaration": true,
-    "esModuleInterop": true,
-    "lib": ["ESNext", "DOM"],
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "noUnusedLocals": true,
-    "outDir": "dist",
-    "strict": true,
-    "sourceMap": true,
-    "target": "ESNext"
-  }
+  "files": [],
+  "references": [
+    { "path": "./packages/minifiable-keywords" },
+    { "path": "./packages/rollup-plugin-minifiable-keywords" },
+    { "path": "./packages/vite-plugin-minifiable-keywords" }
+  ]
 }

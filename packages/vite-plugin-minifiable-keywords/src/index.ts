@@ -1,36 +1,20 @@
 import path from 'node:path';
-import type { EnvironmentModuleGraph, Plugin, ResolvedConfig } from 'vite';
 import {
-  collectKeywordsFromFiles,
+  collectKeywordsAndGenerateTypes,
   extractKeywords,
+  generateModuleCode,
   generateTypesFile,
-  PLUGIN_NAME,
+  RESOLVED_VIRTUAL_MODULE_ID,
   VIRTUAL_MODULE_ID,
-  type MinifiableKeywordsPluginOptions,
-} from './shared';
-
-const RESOLVED_VIRTUAL_MODULE_ID = `\0${VIRTUAL_MODULE_ID}`;
+} from 'minifiable-keywords';
+import type { EnvironmentModuleGraph, Plugin, ResolvedConfig } from 'vite';
+import { PLUGIN_NAME } from './shared';
 
 const splitQuery = (id: string) => id.split('?');
 
-export { MinifiableKeywordsPluginOptions };
-
-export const minifiableKeywordsPlugin = (
-  options: MinifiableKeywordsPluginOptions = {},
-): Plugin & { __OPTIONS__: MinifiableKeywordsPluginOptions } => {
-  const collectedKeywords = new Set<string>();
+export const minifiableKeywordsPlugin = (): Plugin => {
+  let collectedKeywords: Set<string>;
   let config: ResolvedConfig;
-
-  const generateModuleCode = (): string => {
-    const isDev = config.mode !== 'production';
-    const exports = [...collectedKeywords]
-      .map(
-        (key) =>
-          `export const ${key} = /* @__PURE__ */ Symbol(${isDev ? `'${key}'` : ''});\n`,
-      )
-      .join('');
-    return exports;
-  };
 
   const invalidateModule = (
     absoluteId: string,
@@ -45,23 +29,18 @@ export const minifiableKeywordsPlugin = (
 
   return {
     name: PLUGIN_NAME,
-    __OPTIONS__: options,
 
     configResolved(resolvedConfig) {
       config = resolvedConfig;
     },
 
     async buildStart() {
-      collectedKeywords.clear();
-      for (const key of await collectKeywordsFromFiles(
+      collectedKeywords = await collectKeywordsAndGenerateTypes(
         config.root,
         config.logger,
-        config.build.outDir,
-        config.cacheDir,
-      )) {
-        collectedKeywords.add(key);
-      }
-      await generateTypesFile(collectedKeywords, config.root);
+        PLUGIN_NAME,
+        [config.build.outDir, config.cacheDir],
+      );
     },
 
     resolveId(source, importer) {
@@ -77,7 +56,8 @@ export const minifiableKeywordsPlugin = (
     load(id) {
       const [validId] = splitQuery(id);
       if (validId === RESOLVED_VIRTUAL_MODULE_ID) {
-        return generateModuleCode();
+        const isDev = config.mode === 'development';
+        return generateModuleCode(collectedKeywords, isDev);
       }
     },
 
@@ -107,7 +87,7 @@ export const minifiableKeywordsPlugin = (
           RESOLVED_VIRTUAL_MODULE_ID,
           this.environment.moduleGraph,
         );
-        await generateTypesFile(collectedKeywords, config.root);
+        await generateTypesFile(collectedKeywords, config.root, PLUGIN_NAME);
       }
     },
   };

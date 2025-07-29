@@ -1,0 +1,54 @@
+{
+  "name": "vite-plugin-minifiable-keywords",
+  "version": "0.0.13",
+  "description": "A Vite plugin that provides minifiable Symbols to use in place of string literals for extreme minification.",
+  "keywords": [
+    "vite",
+    "vite-plugin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cueaz/vite-plugin-minifiable-keywords.git"
+  },
+  "license": "MIT",
+  "author": "cueaz",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./global": {
+      "types": "./global.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "keywords": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "global.d.ts"
+  ],
+  "scripts": {
+    "build": "tsup"
+  },
+  "dependencies": {
+    "minifiable-keywords": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "tsup": "catalog:"
+  },
+  "peerDependencies": {
+    "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0"
+  }
+}

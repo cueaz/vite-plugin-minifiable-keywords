@@ -2,13 +2,16 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from '@babel/parser';
 import _traverse, { type Node } from '@babel/traverse';
-import { glob } from 'tinyglobby';
-import type { Logger } from 'vite';
+import { globby } from 'globby';
 
-export const PLUGIN_NAME = 'vite-plugin-minifiable-keywords';
 export const VIRTUAL_MODULE_ID = 'virtual:keywords';
+export const RESOLVED_VIRTUAL_MODULE_ID = `\0${VIRTUAL_MODULE_ID}`;
 
-export interface MinifiableKeywordsPluginOptions {}
+export interface Logger {
+  info: (message: string) => void;
+  warn: (message: string) => void;
+  error: (message: string) => void;
+}
 
 // ref: https://github.com/babel/babel/discussions/13093
 const traverse =
@@ -84,6 +87,7 @@ export const extractKeywords = (code: string): Set<string> => {
 export const generateTypesFile = async (
   collectedKeywords: Set<string>,
   root: string,
+  pluginName: string,
   dirname: string = '.keywords',
   filename: string = 'types.d.ts',
 ): Promise<void> => {
@@ -91,7 +95,7 @@ export const generateTypesFile = async (
     .map((key) => `'${key}'`)
     .join(' | ');
   const content = `
-/// <reference types="${PLUGIN_NAME}/global" />
+/// <reference types="${pluginName}/global" />
 declare module '${VIRTUAL_MODULE_ID}/types' {
   interface Types {
     collected: ${collectedKeywords.size > 0 ? collectedType : 'never'};
@@ -105,17 +109,18 @@ declare module '${VIRTUAL_MODULE_ID}/types' {
 export const collectKeywordsFromFiles = async (
   root: string,
   logger: Logger,
-  outDir: string,
-  cacheDir: string,
+  pluginName: string,
+  ignoredDirs: string[] = [],
 ): Promise<Set<string>> => {
   const collectedKeywords = new Set<string>();
 
-  logger.info(`[${PLUGIN_NAME}] Scanning project files for keywords...`);
+  logger.info(`[${pluginName}] Scanning project files for keywords...`);
 
-  const files = await glob('**/*.{js,ts,jsx,tsx}', {
+  const files = await globby('**/*.{js,ts,jsx,tsx}', {
     cwd: root,
     absolute: true,
-    ignore: ['**/node_modules/**', `${outDir}/**`, `${cacheDir}/**`],
+    ignore: ['**/node_modules/**', ...ignoredDirs.map((dir) => `${dir}/**`)],
+    gitignore: true,
   });
 
   await Promise.all(
@@ -129,8 +134,36 @@ export const collectKeywordsFromFiles = async (
   );
 
   logger.info(
-    `[${PLUGIN_NAME}] Scan complete. Found ${collectedKeywords.size} unique keywords.`,
+    `[${pluginName}] Scan complete. Found ${collectedKeywords.size} unique keywords.`,
   );
 
   return collectedKeywords;
+};
+
+export const collectKeywordsAndGenerateTypes = async (
+  root: string,
+  logger: Logger,
+  pluginName: string,
+  ignoredDirs?: string[],
+): Promise<Set<string>> => {
+  const collectedKeywords = await collectKeywordsFromFiles(
+    root,
+    logger,
+    pluginName,
+  );
+  await generateTypesFile(collectedKeywords, root, pluginName);
+  return collectedKeywords;
+};
+
+export const generateModuleCode = (
+  collectedKeywords: Set<string>,
+  isDev: boolean,
+): string => {
+  const exports = [...collectedKeywords]
+    .map(
+      (key) =>
+        `export const ${key} = /* @__PURE__ */ Symbol(${isDev ? `'${key}'` : ''});\n`,
+    )
+    .join('');
+  return exports;
 };

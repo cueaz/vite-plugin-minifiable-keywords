@@ -1,9 +1,6 @@
+import { collectKeywordsAndGenerateTypes } from 'minifiable-keywords';
 import { resolveConfig } from 'vite';
-import {
-  collectKeywordsFromFiles,
-  generateTypesFile,
-  PLUGIN_NAME,
-} from './shared';
+import { PLUGIN_NAME } from './shared';
 
 const main = async () => {
   const config = await resolveConfig({}, 'build');
@@ -19,16 +16,10 @@ const main = async () => {
     process.exit(1);
   }
 
-  // const options = (keywordsPlugin as any).__OPTIONS__ as MinifiableKeywordsPluginOptions;
-
-  const root = config.root;
-  const collectedKeywords = await collectKeywordsFromFiles(
-    root,
-    logger,
+  await collectKeywordsAndGenerateTypes(config.root, logger, PLUGIN_NAME, [
     config.build.outDir,
     config.cacheDir,
-  );
-  await generateTypesFile(collectedKeywords, root);
+  ]);
 };
 
 await main();
