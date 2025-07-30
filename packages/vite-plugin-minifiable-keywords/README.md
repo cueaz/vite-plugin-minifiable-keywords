@@ -9,49 +9,86 @@ This approach introduces a trade-off between a small reduction in bundle size an
 
 ## Rationale
 
-Modern JavaScript minifiers cannot shorten string literals, which are often used for object keys or as distinct values. This plugin offers a solution by providing a mechanism to use `Symbol` primitives in their place. Since these `Symbols` are assigned to variables, they can be minified, leading to a smaller final bundle.
+A common pattern in JavaScript applications, particularly in state management, involves using string literals as unique identifiers.
 
-Consider a standard JavaScript object. The property names are strings and will persist in the minified output.
+```ts
+// A typical action in a state management system
+function setUser(name: string) {
+  return {
+    type: 'SET_USER',
+    payload: { name },
+  };
+}
+```
+
+While minifiers can shorten variable and function names, they cannot alter the string literal `'SET_USER'`. When an application defines dozens of these identifiers, they accumulate as unminifiable overhead in the final bundle.
+
+This plugin addresses this by enabling the use of `Symbol` primitives, which, when assigned to variables, can be safely minified.
 
 **Standard Approach:**
 
-```ts
-// The keys 'userName' and 'preferredTheme' are string literals.
-const userProfile = {
-  userName: 'Alex' as string,
-  preferredTheme: 'dark' as 'light' | 'dark',
-};
-console.log(userProfile.userName);
+In this standard pattern, both the property key `type` and `payload`, and the type value `'SET_USER'` are strings that resist minification.
 
-// Minified Output: The keys remain unchanged.
-const a = { userName: 'Alex', preferredTheme: 'dark' };
-console.log(a.userName);
+```ts
+interface SetUserAction {
+  type: 'SET_USER';
+  payload: { name: string };
+}
+const setUser = (payload: { name: string }): SetUserAction => ({
+  type: 'SET_USER',
+  payload,
+});
+
+function reducer(state: any, action: SetUserAction) {
+  if (action.type === 'SET_USER') {
+    // use action.payload
+  }
+}
+
+// Minified Output: The strings 'type', 'payload', and 'SET_USER' persist.
+// prettier-ignore
+const a=p=>({type:'SET_USER',payload:p});
+// prettier-ignore
+function b(s,a){if(a.type==='SET_USER'){/* ... */}}
 ```
 
-This plugin allows you to adopt a different pattern, using `Symbols` instead of strings. These `Symbols` are imported from a virtual module provided by the plugin.
-
 **With `vite-plugin-minifiable-keywords`:**
+
+By importing from the `virtual:keywords` module, you can replace internal, structural strings with minifiable `Symbol` variables, while leaving the data model intact.
 
 ```ts
 import * as K from 'virtual:keywords';
 
-const userProfile = {
-  [K.userName]: 'Alex' as string,
-  [K.preferredTheme]: K.dark as typeof K.light | typeof K.dark,
-};
-console.log(userProfile[K.userName]);
+interface SetUserAction {
+  [K.type]: typeof K.SET_USER;
+  // The payload's structure remains unchanged for compatibility with external data sources.
+  [K.payload]: { name: string };
+}
+const setUser = (payload: { name: string }): SetUserAction => ({
+  [K.type]: K.SET_USER,
+  [K.payload]: payload,
+});
 
-// Minified Output: The variables representing the Symbols are shortened.
-const b = Symbol();
-const c = Symbol();
-const d = Symbol();
-const a = { [b]: 'Alex', [c]: d };
-console.log(a[b]);
+function reducer(state: any, action: SetUserAction) {
+  if (action[K.type] === K.SET_USER) {
+    // use action[K.payload]
+  }
+}
+
+// Minified Output: All structural identifiers become single-character variables.
+// prettier-ignore
+const a=Symbol(),b=Symbol(),c=Symbol();
+// prettier-ignore
+const d=p=>({[a]:b,[c]:p});
+// prettier-ignore
+function e(s,f){if(f[a]===b){/*...*/}}
 ```
+
+This transforms static string overhead into minifiable variables, effectively reducing the final bundle size by allowing the minifier to do what it does best.
 
 ## Comparison to Property Mangling
 
-Property mangling lacks the semantic context to know which keys are safe to alter, often relying on fragile regex or naming conventions to prevent it from breaking code that interacts with external data or dynamic properties. This plugin takes a different approach by operating on explicit developer intent. Rather than asking a minifier to guess, you refactor a string literal into a minifiable variable (K.myKeyword) that holds a unique Symbol. This provides an unambiguous, structural hint to the build process, enabling safe and predictable minification of identifiers without the risks associated with global property renaming.
+Property mangling lacks the semantic context to know which keys are safe to alter, often relying on fragile regex or naming conventions. This plugin takes a different approach by operating on explicit developer intent. Rather than asking a minifier to guess, you refactor a string literal into a minifiable variable (`K.myKeyword`) that holds a unique Symbol. This provides an unambiguous, structural hint to the build process, enabling safe and predictable minification of identifiers without the risks associated with global property renaming.
 
 ## How It Works
 
@@ -59,10 +96,9 @@ The plugin works by scanning your code for usages of the `virtual:keywords` modu
 
 ```ts
 // virtual:keywords
-export const userName = /* @__PURE__ */ Symbol();
-export const preferredTheme = /* @__PURE__ */ Symbol();
-export const dark = /* @__PURE__ */ Symbol();
-export const light = /* @__PURE__ */ Symbol();
+export const type = /* @__PURE__ */ Symbol();
+export const payload = /* @__PURE__ */ Symbol();
+export const SET_USER = /* @__PURE__ */ Symbol();
 // ... and so on for all other keywords found.
 ```
 
