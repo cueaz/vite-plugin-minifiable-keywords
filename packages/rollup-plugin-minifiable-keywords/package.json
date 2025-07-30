@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-minifiable-keywords",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "A Rollup plugin that provides minifiable Symbols to use in place of string literals for extreme minification.",
   "keywords": [
     "rollup",
@@ -41,15 +41,17 @@
   ],
   "scripts": {
     "build": "tsup",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "test": "vitest"
   },
   "dependencies": {
     "minifiable-keywords": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0",
+    "@types/node": "catalog:",
     "rimraf": "catalog:",
-    "tsup": "catalog:"
+    "tsup": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "rollup": "^3.0.0 || ^4.0.0"
