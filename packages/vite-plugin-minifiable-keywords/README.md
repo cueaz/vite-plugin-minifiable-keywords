@@ -49,6 +49,10 @@ const a = { [b]: 'Alex', [c]: d };
 console.log(a[b]);
 ```
 
+## Comparison to Property Mangling
+
+Property mangling lacks the semantic context to know which keys are safe to alter, often relying on fragile regex or naming conventions to prevent it from breaking code that interacts with external data or dynamic properties. This plugin takes a different approach by operating on explicit developer intent. Rather than asking a minifier to guess, you refactor a string literal into a minifiable variable (K.myKeyword) that holds a unique Symbol. This provides an unambiguous, structural hint to the build process, enabling safe and predictable minification of identifiers without the risks associated with global property renaming.
+
 ## How It Works
 
 The plugin works by scanning your code for usages of the `virtual:keywords` module and generating the corresponding `Symbol` exports and types on the fly.
