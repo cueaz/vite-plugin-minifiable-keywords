@@ -1,9 +1,20 @@
 # vite-plugin-minifiable-keywords
 
+[![NPM][npm-badge]][npm-url]
+[![Github CI][ci-badge]][ci-url]
+[![MIT licensed][license-badge]][license-url]
+
+[npm-badge]: https://img.shields.io/npm/v/vite-plugin-minifiable-keywords.svg
+[npm-url]: https://www.npmjs.com/package/vite-plugin-minifiable-keywords
+[ci-badge]: https://github.com/cueaz/vite-plugin-minifiable-keywords/actions/workflows/ci.yaml/badge.svg
+[ci-url]: https://github.com/cueaz/vite-plugin-minifiable-keywords/actions/workflows/ci.yaml
+[license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[license-url]: https://github.com/cueaz/vite-plugin-minifiable-keywords/blob/main/LICENSE
+
 > [!NOTE]
 > A Rollup version of this plugin, `rollup-plugin-minifiable-keywords`, is also available. The primary difference is that the Vite plugin utilizes the `hotUpdate` hook to incrementally collect keywords and update modules and types during development. While this documentation is written primarily for the Vite plugin, the setup is almost identical—just add `rollup-plugin-minifiable-keywords` to your Rollup configuration.
 
-A Vite plugin that provides a way to use minifiable `Symbols` in place of string literals and object keys, aimed at developers focused on extreme minification.
+A Vite plugin that provides a way to use minifiable `Symbols` in place of string literals and object keys, offering a potential strategy for extreme minification.
 
 This approach introduces a trade-off between a small reduction in bundle size and an increase in code complexity. It is best suited for ~~applications where every byte counts~~ minification nerds.
 
@@ -21,7 +32,7 @@ function setUser(name: string) {
 }
 ```
 
-While minifiers can shorten variable and function names, they cannot alter the string literal `'SET_USER'`. When an application defines dozens of these identifiers, they accumulate as unminifiable overhead in the final bundle.
+While minifiers can shorten variable and function names, they cannot alter the string literals. When an application defines dozens of these identifiers, they accumulate as unminifiable overhead in the final bundle.
 
 This plugin addresses this by enabling the use of `Symbol` primitives, which, when assigned to variables, can be safely minified.
 
@@ -49,7 +60,7 @@ function reducer(state: any, action: SetUserAction) {
 // prettier-ignore
 const a=p=>({type:'SET_USER',payload:p});
 // prettier-ignore
-function b(s,a){if(a.type==='SET_USER'){/* ... */}}
+function b(s,a){if(a.type==='SET_USER'){/*...*/}}
 ```
 
 **With `vite-plugin-minifiable-keywords`:**
@@ -84,11 +95,11 @@ const d=p=>({[a]:b,[c]:p});
 function e(s,f){if(f[a]===b){/*...*/}}
 ```
 
-This transforms static string overhead into minifiable variables, effectively reducing the final bundle size by allowing the minifier to do what it does best.
+This transforms static string overhead into minifiable variables, allowing the minifier to do what it does best.
 
 ## Comparison to Property Mangling
 
-Property mangling lacks the semantic context to know which keys are safe to alter, often relying on fragile regex or naming conventions. This plugin takes a different approach by operating on explicit developer intent. Rather than asking a minifier to guess, you refactor a string literal into a minifiable variable (`K.myKeyword`) that holds a unique Symbol. This provides an unambiguous, structural hint to the build process, enabling safe and predictable minification of identifiers without the risks associated with global property renaming.
+Property mangling lacks the semantic context to know which keys are safe to alter, often relying on fragile regex or naming conventions. This plugin takes a different approach by operating on explicit developer intent. Rather than asking a minifier to guess, you refactor a string literal into a minifiable variable (`K.myKeyword`) that holds a unique `Symbol`. This provides an unambiguous, structural hint to the build process, enabling safe and predictable minification of identifiers without the risks associated with global property renaming.
 
 ## How It Works
 
