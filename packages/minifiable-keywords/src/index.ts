@@ -13,6 +13,25 @@ export interface Logger {
   error: (message: string) => void;
 }
 
+export interface PrefixedLogger extends Logger {
+  pluginName: string;
+}
+
+export const createPrefixedLogger = (
+  logger: Logger,
+  pluginName: string,
+  usePrefix: boolean = true,
+): PrefixedLogger => {
+  const prefix = usePrefix ? `[${pluginName}] ` : '';
+  const prefixed = (message: string) => `${prefix}${message}`;
+  return {
+    pluginName,
+    info: (message: string) => logger.info(prefixed(message)),
+    warn: (message: string) => logger.warn(prefixed(message)),
+    error: (message: string) => logger.error(prefixed(message)),
+  };
+};
+
 // ref: https://github.com/babel/babel/discussions/13093
 const traverse =
   typeof _traverse === 'function'
@@ -108,13 +127,12 @@ declare module '${VIRTUAL_MODULE_ID}/types' {
 
 export const collectKeywordsFromFiles = async (
   root: string,
-  logger: Logger,
-  pluginName: string,
+  logger: PrefixedLogger,
   ignoredDirs: string[] = [],
 ): Promise<Set<string>> => {
   const collectedKeywords = new Set<string>();
 
-  logger.info(`[${pluginName}] Scanning project files for keywords...`);
+  logger.info('Scanning project files for keywords...');
 
   const files = await globby('**/*.{js,ts,jsx,tsx}', {
     cwd: root,
@@ -134,7 +152,7 @@ export const collectKeywordsFromFiles = async (
   );
 
   logger.info(
-    `[${pluginName}] Scan complete. Found ${collectedKeywords.size} unique keywords.`,
+    `Scan complete. Found ${collectedKeywords.size} unique keywords.`,
   );
 
   return collectedKeywords;
@@ -142,16 +160,15 @@ export const collectKeywordsFromFiles = async (
 
 export const collectKeywordsAndGenerateTypes = async (
   root: string,
-  logger: Logger,
-  pluginName: string,
+  logger: PrefixedLogger,
   ignoredDirs?: string[],
 ): Promise<Set<string>> => {
   const collectedKeywords = await collectKeywordsFromFiles(
     root,
     logger,
-    pluginName,
+    ignoredDirs,
   );
-  await generateTypesFile(collectedKeywords, root, pluginName);
+  await generateTypesFile(collectedKeywords, root, logger.pluginName);
   return collectedKeywords;
 };
 

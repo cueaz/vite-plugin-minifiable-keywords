@@ -1,12 +1,14 @@
 import path from 'node:path';
 import {
   collectKeywordsAndGenerateTypes,
+  createPrefixedLogger,
   extractKeywords,
   generateModuleCode,
   generateTypesFile,
   RESOLVED_VIRTUAL_MODULE_ID,
   splitQuery,
   VIRTUAL_MODULE_ID,
+  type PrefixedLogger,
 } from 'minifiable-keywords';
 import type { EnvironmentModuleGraph, Plugin, ResolvedConfig } from 'vite';
 import { PLUGIN_NAME } from './shared';
@@ -14,6 +16,7 @@ import { PLUGIN_NAME } from './shared';
 export const minifiableKeywordsPlugin = (): Plugin => {
   let collectedKeywords: Set<string>;
   let config: ResolvedConfig;
+  let logger: PrefixedLogger;
 
   const invalidateModule = (
     absoluteId: string,
@@ -31,13 +34,13 @@ export const minifiableKeywordsPlugin = (): Plugin => {
 
     configResolved(resolvedConfig) {
       config = resolvedConfig;
+      logger = createPrefixedLogger(config.logger, PLUGIN_NAME);
     },
 
     async buildStart() {
       collectedKeywords = await collectKeywordsAndGenerateTypes(
         config.root,
-        config.logger,
-        PLUGIN_NAME,
+        logger,
         [config.build.outDir, config.cacheDir],
       );
     },
