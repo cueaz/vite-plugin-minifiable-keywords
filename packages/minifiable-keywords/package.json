@@ -1,6 +1,6 @@
 {
   "name": "minifiable-keywords",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cueaz/vite-plugin-minifiable-keywords.git"
@@ -19,16 +19,12 @@
         "default": "./dist/index.cjs"
       }
     },
-    "./global": {
-      "types": "./global.d.ts"
-    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist",
-    "global.d.ts"
+    "dist"
   ],
   "scripts": {
     "build": "tsup",

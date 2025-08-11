@@ -110,16 +110,10 @@ export const generateTypesFile = async (
   dirname: string = '.keywords',
   filename: string = 'types.d.ts',
 ): Promise<void> => {
-  const collectedType = [...collectedKeywords]
-    .map((key) => `'${key}'`)
-    .join(' | ');
-  const content = `
-/// <reference types="${pluginName}/global" />
-declare module '${VIRTUAL_MODULE_ID}/types' {
-  interface Types {
-    collected: ${collectedKeywords.size > 0 ? collectedType : 'never'};
-  }
-}`;
+  const exports = [...collectedKeywords]
+    .map((key) => `  export const ${key}: unique symbol;`)
+    .join('\n');
+  const content = `declare module '${VIRTUAL_MODULE_ID}' {\n${exports}\n}`;
   const pluginRoot = path.join(root, dirname);
   await mkdir(pluginRoot, { recursive: true });
   await writeFile(path.join(pluginRoot, filename), `${content.trim()}\n`);
