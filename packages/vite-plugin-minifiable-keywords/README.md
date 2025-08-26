@@ -60,7 +60,7 @@ function reducer(state: any, action: SetUserAction) {
 // prettier-ignore
 const a=p=>({type:'SET_USER',payload:p});
 // prettier-ignore
-function b(s,a){if(a.type==='SET_USER'){/*...*/}}
+function b(s,c){if(c.type==='SET_USER'){/*...*/}}
 ```
 
 **With `vite-plugin-minifiable-keywords`:**
@@ -88,9 +88,7 @@ function reducer(state: any, action: SetUserAction) {
 
 // Minified Output: All structural identifiers become single-character variables.
 // prettier-ignore
-const a=Symbol(),b=Symbol(),c=Symbol();
-// prettier-ignore
-const d=p=>({[a]:b,[c]:p});
+const k=Symbol,a=k(),b=k(),c=k(),d=p=>({[a]:b,[c]:p});
 // prettier-ignore
 function e(s,f){if(f[a]===b){/*...*/}}
 ```
@@ -107,10 +105,17 @@ The plugin works by scanning your code for usages of the `virtual:keywords` modu
 
 ```ts
 // virtual:keywords
-export const type = /* @__PURE__ */ Symbol();
-export const payload = /* @__PURE__ */ Symbol();
-export const SET_USER = /* @__PURE__ */ Symbol();
+const __SYMBOL__ = Symbol;
+const _type = /* @__PURE__ */ __SYMBOL__(); // __SYMBOL__('type') in dev mode
+const _payload = /* @__PURE__ */ __SYMBOL__(); // __SYMBOL__('payload') in dev mode
+const _SET_USER = /* @__PURE__ */ __SYMBOL__(); // __SYMBOL__('SET_USER') in dev mode
 // ... and so on for all other keywords found.
+export {
+  _type as type,
+  _payload as payload,
+  _SET_USER as SET_USER,
+  // ... and so on
+};
 ```
 
 ## Installation

@@ -170,13 +170,20 @@ export const generateModuleCode = (
   collectedKeywords: Set<string>,
   isDev: boolean,
 ): string => {
-  const exports = [...collectedKeywords]
+  const symbolConstructorName = '__SYMBOL__';
+  const symbolDeclaration = `const ${symbolConstructorName} = Symbol;\n`;
+  const keywordPrefix = '_';
+  const keywordDeclarations = [...collectedKeywords]
     .map(
       (key) =>
-        `export const ${key} = /* @__PURE__ */ Symbol(${isDev ? `'${key}'` : ''});\n`,
+        `const ${keywordPrefix}${key} = /* @__PURE__ */ ${symbolConstructorName}(${isDev ? `'${key}'` : ''});\n`,
     )
     .join('');
-  return exports;
+  const exports = [...collectedKeywords].map(
+    (key) => `  ${keywordPrefix}${key} as ${key},\n`,
+  );
+  const exportDeclaration = `export {\n${exports.join('')}};\n`;
+  return `${symbolDeclaration}${keywordDeclarations}${exportDeclaration}`;
 };
 
 export const splitQuery = (id: string) => id.split('?');

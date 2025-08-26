@@ -28,19 +28,17 @@ describe('minifiable-keywords', () => {
     it('should generate module code with keywords', () => {
       const keywords = new Set(['foo', 'bar']);
       const code = generateModuleCode(keywords, true);
-      expect(code).toContain(
-        "export const foo = /* @__PURE__ */ Symbol('foo');",
-      );
-      expect(code).toContain(
-        "export const bar = /* @__PURE__ */ Symbol('bar');",
-      );
+      expect(code).toContain('const __SYMBOL__ = Symbol;');
+      expect(code).toContain("const _foo = /* @__PURE__ */ __SYMBOL__('foo');");
+      expect(code).toContain("const _bar = /* @__PURE__ */ __SYMBOL__('bar');");
+      expect(code).toContain('export {\n  _foo as foo,\n  _bar as bar,\n};');
     });
 
     it('should generate module code without debug info in prod mode', () => {
       const keywords = new Set(['foo', 'bar']);
       const code = generateModuleCode(keywords, false);
-      expect(code).toContain('export const foo = /* @__PURE__ */ Symbol();');
-      expect(code).toContain('export const bar = /* @__PURE__ */ Symbol();');
+      expect(code).toContain('const _foo = /* @__PURE__ */ __SYMBOL__();');
+      expect(code).toContain('const _bar = /* @__PURE__ */ __SYMBOL__();');
     });
   });
 });
