@@ -14,7 +14,7 @@
 > [!NOTE]
 > A Rollup version of this plugin, `rollup-plugin-minifiable-keywords`, is also available. The primary difference is that the Vite plugin utilizes the `hotUpdate` hook to incrementally collect keywords and update modules and types during development. While this documentation is written primarily for the Vite plugin, the setup is almost identical—just add `rollup-plugin-minifiable-keywords` to your Rollup configuration.
 
-A Vite plugin that provides a way to use minifiable `Symbols` in place of string literals and object keys, offering a potential strategy for extreme minification.
+A Vite plugin that provides a way to use minifiable `Symbols` in place of string literals and object keys, offering a potential strategy for aggressive minification.
 
 This approach introduces a trade-off between a small reduction in bundle size and an increase in code complexity. It is best suited for ~~applications where every byte counts~~ minification nerds.
 

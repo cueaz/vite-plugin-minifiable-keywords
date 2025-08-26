@@ -1,7 +1,7 @@
 {
   "name": "rollup-plugin-minifiable-keywords",
-  "version": "0.0.19",
-  "description": "A Rollup plugin that provides minifiable Symbols to use in place of string literals for extreme minification.",
+  "version": "0.0.20",
+  "description": "A Rollup plugin that provides minifiable Symbols to use in place of string literals for aggressive minification.",
   "keywords": [
     "rollup",
     "rollup-plugin",
