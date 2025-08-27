@@ -186,7 +186,7 @@ None
 
 ## Limitations
 
-- **Frameworks**: The plugin uses Babel to parse JavaScript and TypeScript files. It cannot parse keywords from inside the template blocks of frameworks like Vue, Svelte, or Astro.
+- **(TODO) Frameworks**: The plugin uses Babel to parse JavaScript and TypeScript files. It cannot parse keywords from Vue, Svelte, or Astro files yet.
 - **Dynamic Access**: Only static property access (e.g., `K.myKeyword`) is detected. Dynamic, computed access (e.g., `K['myKeyword']`) will not be identified by the plugin.
 
 ## License
