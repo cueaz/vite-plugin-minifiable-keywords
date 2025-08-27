@@ -40,6 +40,7 @@ const traverse =
 
 export const extractKeywords = (code: string): Set<string> => {
   const keywords = new Set<string>();
+
   let ast: Node;
   try {
     ast = parse(code, {
@@ -51,27 +52,36 @@ export const extractKeywords = (code: string): Set<string> => {
     return keywords;
   }
 
-  let keywordNamespace: string | null = null;
+  const keywordNamespaces = new Set<string>();
 
   traverse(ast, {
     enter(nodePath) {
       const node = nodePath.node;
+
       if (
         node.type === 'ImportDeclaration' &&
         node.source.value === VIRTUAL_MODULE_ID
       ) {
-        const specifier = node.specifiers.find(
-          (s) => s.type === 'ImportNamespaceSpecifier',
-        );
-        if (specifier) {
-          keywordNamespace = specifier.local.name;
-          nodePath.stop();
+        for (const specifier of node.specifiers) {
+          if (specifier.type === 'ImportNamespaceSpecifier') {
+            keywordNamespaces.add(specifier.local.name);
+          }
+
+          if (specifier.type === 'ImportDefaultSpecifier') {
+            keywords.add('default');
+          }
+
+          if (specifier.type === 'ImportSpecifier') {
+            if (specifier.imported.type === 'Identifier') {
+              keywords.add(specifier.imported.name);
+            }
+          }
         }
       }
     },
   });
 
-  if (!keywordNamespace) {
+  if (keywordNamespaces.size === 0) {
     return keywords;
   }
 
@@ -83,7 +93,7 @@ export const extractKeywords = (code: string): Set<string> => {
         node.type === 'MemberExpression' &&
         !node.computed && // Exclude computed properties like K['xyz']
         node.object.type === 'Identifier' &&
-        node.object.name === keywordNamespace &&
+        keywordNamespaces.has(node.object.name) &&
         node.property.type === 'Identifier'
       ) {
         keywords.add(node.property.name);
@@ -92,7 +102,7 @@ export const extractKeywords = (code: string): Set<string> => {
       if (
         node.type === 'TSQualifiedName' &&
         node.left.type === 'Identifier' &&
-        node.left.name === keywordNamespace &&
+        keywordNamespaces.has(node.left.name) &&
         node.right.type === 'Identifier'
       ) {
         keywords.add(node.right.name);

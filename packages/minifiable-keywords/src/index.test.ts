@@ -3,7 +3,7 @@ import { extractKeywords, generateModuleCode } from './index';
 
 describe('minifiable-keywords', () => {
   describe('extractKeywords', () => {
-    it('should extract keywords from code', () => {
+    it('should extract keywords from namespaced import', () => {
       const code = `
         import * as K from 'virtual:keywords';
         const a = K.foo;
@@ -21,6 +21,14 @@ describe('minifiable-keywords', () => {
       `;
       const keywords = extractKeywords(code);
       expect(keywords).toEqual(new Set());
+    });
+
+    it('should extract keywords from default and named imports', () => {
+      const code = `
+        import def, { foo, bar as baz } from 'virtual:keywords';
+      `;
+      const keywords = extractKeywords(code);
+      expect(keywords).toEqual(new Set(['default', 'foo', 'bar']));
     });
   });
 
