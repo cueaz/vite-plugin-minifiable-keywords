@@ -89,7 +89,7 @@ export const minifiableKeywordsPlugin = (): Plugin => {
           RESOLVED_VIRTUAL_MODULE_ID,
           this.environment.moduleGraph,
         );
-        await generateTypesFile(collectedKeywords, config.root, PLUGIN_NAME);
+        await generateTypesFile(collectedKeywords, config.root);
       }
     },
   };

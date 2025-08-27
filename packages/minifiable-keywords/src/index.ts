@@ -103,17 +103,28 @@ export const extractKeywords = (code: string): Set<string> => {
   return keywords;
 };
 
+const keywordConstPrefix = '_';
+const createExportDeclaration = (keywords: Set<string>): string[] => {
+  const aliases = [...keywords].map(
+    (key) => `  ${keywordConstPrefix}${key} as ${key},`,
+  );
+  return [`export {`, ...aliases, `};`];
+};
+
 export const generateTypesFile = async (
   collectedKeywords: Set<string>,
   root: string,
-  pluginName: string,
   dirname: string = '.keywords',
   filename: string = 'types.d.ts',
 ): Promise<void> => {
-  const exports = [...collectedKeywords]
-    .map((key) => `  export const ${key}: unique symbol;`)
+  const keywordDeclarations = [...collectedKeywords]
+    .map((key) => `const ${keywordConstPrefix}${key}: unique symbol;`)
+    .map((line) => `  ${line}`)
     .join('\n');
-  const content = `declare module '${VIRTUAL_MODULE_ID}' {\n${exports}\n}`;
+  const exportDeclaration = createExportDeclaration(collectedKeywords)
+    .map((line) => `  ${line}`)
+    .join('\n');
+  const content = `declare module '${VIRTUAL_MODULE_ID}' {\n${keywordDeclarations}\n${exportDeclaration}\n}`;
   const pluginRoot = path.join(root, dirname);
   await mkdir(pluginRoot, { recursive: true });
   await writeFile(path.join(pluginRoot, filename), `${content.trim()}\n`);
@@ -162,7 +173,7 @@ export const collectKeywordsAndGenerateTypes = async (
     logger,
     ignoredDirs,
   );
-  await generateTypesFile(collectedKeywords, root, logger.pluginName);
+  await generateTypesFile(collectedKeywords, root);
   return collectedKeywords;
 };
 
@@ -171,19 +182,16 @@ export const generateModuleCode = (
   isDev: boolean,
 ): string => {
   const symbolConstructorName = '__SYMBOL__';
-  const symbolDeclaration = `const ${symbolConstructorName} = Symbol;\n`;
-  const keywordPrefix = '_';
+  const symbolDeclaration = `const ${symbolConstructorName} = Symbol;`;
   const keywordDeclarations = [...collectedKeywords]
     .map(
       (key) =>
-        `const ${keywordPrefix}${key} = /* @__PURE__ */ ${symbolConstructorName}(${isDev ? `'${key}'` : ''});\n`,
+        `const ${keywordConstPrefix}${key} = /* @__PURE__ */ ${symbolConstructorName}(${isDev ? `'${key}'` : ''});`,
     )
-    .join('');
-  const exports = [...collectedKeywords].map(
-    (key) => `  ${keywordPrefix}${key} as ${key},\n`,
-  );
-  const exportDeclaration = `export {\n${exports.join('')}};\n`;
-  return `${symbolDeclaration}${keywordDeclarations}${exportDeclaration}`;
+    .join('\n');
+  const exportDeclaration =
+    createExportDeclaration(collectedKeywords).join('\n');
+  return `${symbolDeclaration}\n${keywordDeclarations}\n${exportDeclaration}\n`;
 };
 
 export const splitQuery = (id: string) => id.split('?');
