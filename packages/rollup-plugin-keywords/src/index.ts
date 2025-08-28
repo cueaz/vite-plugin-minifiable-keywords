@@ -10,7 +10,7 @@ import {
 import type { Plugin } from 'rollup';
 import { PLUGIN_NAME } from './shared';
 
-export const minifiableKeywordsPlugin = (): Plugin => {
+export const keywordsPlugin = (): Plugin => {
   let collectedKeywords: Set<string>;
   let logger: PrefixedLogger;
   const root = process.cwd();
@@ -52,4 +52,4 @@ export const minifiableKeywordsPlugin = (): Plugin => {
   };
 };
 
-export default minifiableKeywordsPlugin;
+export default keywordsPlugin;

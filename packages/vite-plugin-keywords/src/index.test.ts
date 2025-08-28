@@ -5,7 +5,7 @@ import {
 } from 'minifiable-keywords';
 import type { Plugin, ResolvedConfig } from 'vite';
 import { describe, expect, it, vi } from 'vitest';
-import { minifiableKeywordsPlugin } from './index';
+import { keywordsPlugin } from './index';
 import { PLUGIN_NAME } from './shared';
 
 const createMockConfig = (root: string): ResolvedConfig =>
@@ -26,16 +26,16 @@ const createMockConfig = (root: string): ResolvedConfig =>
     mode: 'development',
   }) as unknown as ResolvedConfig;
 
-describe('vite-plugin-minifiable-keywords', () => {
+describe('vite-plugin-keywords', () => {
   it('should have the correct name', () => {
-    const plugin = minifiableKeywordsPlugin();
+    const plugin = keywordsPlugin();
     expect(plugin.name).toBe(PLUGIN_NAME);
   });
 
   it('should collect keywords and load the virtual module', async () => {
     const root = path.resolve(__dirname, '..', 'tests', 'fixtures');
     const config = createMockConfig(root);
-    const plugin = minifiableKeywordsPlugin() as Plugin;
+    const plugin = keywordsPlugin() as Plugin;
 
     // @ts-expect-error - configResolved is a function
     plugin.configResolved(config);

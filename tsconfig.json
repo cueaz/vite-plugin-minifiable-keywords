@@ -2,7 +2,7 @@
   "files": [],
   "references": [
     { "path": "./packages/minifiable-keywords" },
-    { "path": "./packages/rollup-plugin-minifiable-keywords" },
-    { "path": "./packages/vite-plugin-minifiable-keywords" }
+    { "path": "./packages/rollup-plugin-keywords" },
+    { "path": "./packages/vite-plugin-keywords" }
   ]
 }

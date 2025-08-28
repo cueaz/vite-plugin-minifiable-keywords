@@ -1,1 +1,1 @@
-packages/vite-plugin-minifiable-keywords/README.md
+packages/vite-plugin-keywords/README.md

@@ -5,7 +5,7 @@ import {
 } from 'minifiable-keywords';
 import type { Plugin, PluginContext } from 'rollup';
 import { describe, expect, it, vi } from 'vitest';
-import { minifiableKeywordsPlugin } from './index';
+import { keywordsPlugin } from './index';
 import { PLUGIN_NAME } from './shared';
 
 const createMockPluginContext = (): PluginContext =>
@@ -34,9 +34,9 @@ const createMockPluginContext = (): PluginContext =>
     environment: {},
   }) as unknown as PluginContext;
 
-describe('rollup-plugin-minifiable-keywords', () => {
+describe('rollup-plugin-keywords', () => {
   it('should have the correct name', () => {
-    const plugin = minifiableKeywordsPlugin();
+    const plugin = keywordsPlugin();
     expect(plugin.name).toBe(PLUGIN_NAME);
   });
 
@@ -45,7 +45,7 @@ describe('rollup-plugin-minifiable-keywords', () => {
     const root = path.resolve(__dirname, '..', 'tests', 'fixtures');
     process.cwd = () => root;
 
-    const plugin = minifiableKeywordsPlugin() as Plugin;
+    const plugin = keywordsPlugin() as Plugin;
     const context = createMockPluginContext();
 
     const buildStart = plugin.buildStart as Function;

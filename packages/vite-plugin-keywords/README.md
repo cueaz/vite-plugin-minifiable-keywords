@@ -1,20 +1,20 @@
-# vite-plugin-minifiable-keywords
+# vite-plugin-keywords
 
 [![NPM][npm-badge]][npm-url]
 [![Github CI][ci-badge]][ci-url]
 [![MIT licensed][license-badge]][license-url]
 
-[npm-badge]: https://img.shields.io/npm/v/vite-plugin-minifiable-keywords.svg
-[npm-url]: https://www.npmjs.com/package/vite-plugin-minifiable-keywords
-[ci-badge]: https://github.com/cueaz/vite-plugin-minifiable-keywords/actions/workflows/ci.yaml/badge.svg
-[ci-url]: https://github.com/cueaz/vite-plugin-minifiable-keywords/actions/workflows/ci.yaml
+[npm-badge]: https://img.shields.io/npm/v/vite-plugin-keywords.svg
+[npm-url]: https://www.npmjs.com/package/vite-plugin-keywords
+[ci-badge]: https://github.com/cueaz/vite-plugin-keywords/actions/workflows/ci.yaml/badge.svg
+[ci-url]: https://github.com/cueaz/vite-plugin-keywords/actions/workflows/ci.yaml
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
-[license-url]: https://github.com/cueaz/vite-plugin-minifiable-keywords/blob/main/LICENSE
+[license-url]: https://github.com/cueaz/vite-plugine-keywords/blob/main/LICENSE
 
 > [!NOTE]
-> A Rollup version of this plugin, `rollup-plugin-minifiable-keywords`, is also available. The primary difference is that the Vite plugin utilizes the `hotUpdate` hook to incrementally collect keywords and update modules and types during development. While this documentation is written primarily for the Vite plugin, the setup is almost identical—just add `rollup-plugin-minifiable-keywords` to your Rollup configuration.
+> A Rollup version of this plugin, `rollup-plugin-keywords`, is also available. The primary difference is that the Vite plugin utilizes the `hotUpdate` hook to incrementally collect keywords and update modules and types during development. While this documentation is written primarily for the Vite plugin, the setup is almost identical—just add `rollup-plugin-keywords` to your Rollup configuration.
 
-A Vite plugin that provides a way to use minifiable `Symbols` in place of string literals and object keys, offering a potential strategy for aggressive minification.
+A Vite plugin that provides a way to use minifiable `Symbols` (keywords) in place of string literals and object keys, offering a potential strategy for aggressive minification.
 
 This approach introduces a trade-off between a small reduction in bundle size and an increase in code complexity. It is best suited for ~~applications where every byte counts~~ minification nerds.
 
@@ -63,7 +63,7 @@ const a=p=>({type:'SET_USER',payload:p});
 function b(s,c){if(c.type==='SET_USER'){/*...*/}}
 ```
 
-**With `vite-plugin-minifiable-keywords`:**
+**With `vite-plugin-keywords`:**
 
 By importing from the `virtual:keywords` module, you can replace internal, structural strings with minifiable `Symbol` variables, while leaving the data model intact.
 
@@ -121,11 +121,11 @@ export {
 ## Installation
 
 ```bash
-npm install -D vite-plugin-minifiable-keywords
+npm install -D vite-plugin-keywords
 # or
-yarn add -D vite-plugin-minifiable-keywords
+yarn add -D vite-plugin-keywords
 # or
-pnpm add -D vite-plugin-minifiable-keywords
+pnpm add -D vite-plugin-keywords
 ```
 
 ## Setup
@@ -135,7 +135,7 @@ pnpm add -D vite-plugin-minifiable-keywords
     ```ts
     // vite.config.ts
     import { defineConfig } from 'vite';
-    import keywords from 'vite-plugin-minifiable-keywords';
+    import keywords from 'vite-plugin-keywords';
 
     export default defineConfig({
       plugins: [keywords()],

@@ -13,7 +13,7 @@ import {
 import type { EnvironmentModuleGraph, Plugin, ResolvedConfig } from 'vite';
 import { PLUGIN_NAME } from './shared';
 
-export const minifiableKeywordsPlugin = (): Plugin => {
+export const keywordsPlugin = (): Plugin => {
   let collectedKeywords: Set<string>;
   let config: ResolvedConfig;
   let logger: PrefixedLogger;
@@ -95,4 +95,4 @@ export const minifiableKeywordsPlugin = (): Plugin => {
   };
 };
 
-export default minifiableKeywordsPlugin;
+export default keywordsPlugin;

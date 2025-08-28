@@ -1,7 +1,7 @@
 {
-  "name": "rollup-plugin-minifiable-keywords",
-  "version": "0.0.22",
-  "description": "A Rollup plugin that provides minifiable Symbols to use in place of string literals for aggressive minification.",
+  "name": "rollup-plugin-keywords",
+  "version": "0.0.23",
+  "description": "A Rollup plugin that provides minifiable Symbols (keywords) to use in place of string literals for aggressive minification.",
   "keywords": [
     "rollup",
     "rollup-plugin",
@@ -9,7 +9,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cueaz/vite-plugin-minifiable-keywords.git"
+    "url": "git+https://github.com/cueaz/vite-plugin-keywords.git"
   },
   "license": "MIT",
   "author": "cueaz",

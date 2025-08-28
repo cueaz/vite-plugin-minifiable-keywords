@@ -1,9 +1,9 @@
 {
   "name": "minifiable-keywords",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cueaz/vite-plugin-minifiable-keywords.git"
+    "url": "git+https://github.com/cueaz/vite-plugin-keywords.git"
   },
   "license": "MIT",
   "author": "cueaz",
